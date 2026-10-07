@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Interaktif Informatika - Microsoft Excel</title>
+    <style>
+        :root {
+            --primary: #107c41; /* Warna khas Excel */
+            --secondary: #21a366;
+            --bg: #f3f5f8;
+            --text: #333333;
+            --card: #ffffff;
+            --danger: #d9534f;
+            --success: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--card);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h2, .header h3, .header h4 {
+            margin: 5px 0;
+            color: var(--primary);
+        }
+
+        .timer-container {
+            position: sticky;
+            top: 10px;
+            background: #e8f5e9;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid #c8e6c9;
+        }
+
+        .timer {
+            color: var(--danger);
+            font-size: 1.2rem;
+        }
+
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        .question-card {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .question-title {
+            font-weight: bold;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .options label {
+            display: block;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .options label:hover {
+            background: #e8f5e9;
+            border-color: var(--primary);
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background-color: #0b582e;
+        }
+
+        .btn-retry {
+            background-color: #ff9800;
+        }
+
+        .btn-retry:hover {
+            background-color: #e68a00;
+        }
+
+        .btn-wa {
+            background-color: #25d366;
+        }
+
+        .btn-wa:hover {
+            background-color: #1eb956;
+        }
+
+        #result-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .score-box {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .status-msg {
+            font-size: 1.3rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h2>SOAL INTERAKTIF INFORMATIKA FASE D</h2>
+        <h3>MATERI: MICROSOFT EXCEL</h3>
+        <h4>SMP NEGERI 2 NGADIREJO</h4>
+        <p><small>Guru Pengampu: Budi Winarno, S.Kom.</small></p>
+    </div>
+
+    <!-- Halaman Soal -->
+    <div id="quiz-screen">
+        <div class="student-info">
+            <div class="input-group">
+                <label for="nama">Nama Lengkap:</label>
+                <input type="text" id="nama" placeholder="Masukkan nama Anda">
+            </div>
+            <div class="input-group">
+                <label for="kelas">Kelas / No. Absen:</label>
+                <input type="text" id="kelas" placeholder="Contoh: 8A / 12">
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <span>Sisa Waktu Ujian:</span>
+            <span id="timer" class="timer">60:00</span>
+        </div>
+
+        <div id="questions-container"></div>
+
+        <button class="btn" onclick="submitQuiz()">Selesai & Kumpulkan Jawaban</button>
+    </div>
+
+    <!-- Halaman Hasil / Nilai -->
+    <div id="result-screen">
+        <h2>Hasil Ujian Interaktif</h2>
+        <p id="res-nama" style="font-weight: bold; margin-bottom: 2px;"></p>
+        <p id="res-kelas" style="color: #666; margin-top: 0;"></p>
+        
+        <div class="score-box" id="res-score">0</div>
+        
+        <div id="status-message" class="status-msg"></div>
+        <p id="res-detail"></p>
+
+        <div id="action-buttons">
+            <button class="btn" onclick="downloadResult()">Unduh Hasil Nilai (TXT)</button>
+            <button class="btn btn-wa" onclick="sendWA()">Kirim Nilai ke Guru via WhatsApp</button>
+            <button id="btn-repeat" class="btn btn-retry" onclick="resetQuiz()" style="display:none;">Ulangi Ujian (Kembali ke Soal)</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const rawQuestions = [
+    {q: "Microsoft Excel merupakan aplikasi pengolah...", options: ["Kata", "Angka / Lembar Kerja", "Presentasi", "Gambar"], answer: 1},
+    {q: "Pertemuan antara kolom dan baris dalam Microsoft Excel disebut...", options: ["Cell", "Range", "Column", "Row"], answer: 0},
+    {q: "Kumpulan dari beberapa sel yang dipilih pada Excel dinamakan...", options: ["Grid", "Range", "Sheet", "Workbook"], answer: 1},
+    {q: "Penulisan rumus atau formula pada Microsoft Excel harus selalu diawali dengan simbol...", options: ["+", "@", "=", "#"], answer: 2},
+    {q: "Fungsi utama dari fungsi SUM pada Microsoft Excel adalah...", options: ["Menghitung rata-rata", "Menjumlahkan sekelompok nilai", "Mencari nilai tertinggi", "Mencari nilai terendah"], answer: 1},
+    {q: "Untuk menghitung nilai rata-rata dari sekumpulan data, digunakan fungsi...", options: ["AVERAGE", "SUM", "COUNT", "MAX"], answer: 0},
+    {q: "Fungsi yang digunakan untuk mencari nilai tertinggi dalam suatu range adalah...", options: ["MIN", "MAX", "HIGH", "TOP"], answer: 1},
+    {q: "Fungsi yang digunakan untuk mencari nilai terendah dari suatu range data adalah...", options: ["LOW", "BOTTOM", "MIN", "MAX"], answer: 2},
+    {q: "Fungsi COUNT pada Microsoft Excel digunakan untuk...", options: ["Menghitung jumlah sel yang berisi angka", "Menghitung nilai rata-rata", "Menjumlahkan angka", "Mencari nilai tengah"], answer: 0},
+    {q: "Kolom pada Excel ditandai dengan huruf (A, B, C, dst), sedangkan Baris (Row) ditandai dengan...", options: ["Angka (1, 2, 3, dst)", "Simbol (!, @, #)", "Huruf kecil (a, b, c)", "Kombinasi huruf dan angka"], answer: 0},
+    {q: "Alamat sel yang terbentuk dari kolom B dan baris ke-5 adalah...", options: ["5B", "B-5", "B5", "B.5"], answer: 2},
+    {q: "Ekstensi standar file workbook Microsoft Excel versi modern adalah...", options: [".docx", ".pptx", ".xlsx", ".txt"], answer: 2},
+    {q: "Operator matematika yang digunakan untuk melakukan operasi perkalian pada Excel adalah...", options: ["x", "*", ":", "^"], answer: 1},
+    {q: "Operator matematika yang digunakan untuk operasi pembagian adalah...", options: ["\\", "/", ":", "%"], answer: 1},
+    {q: "Simbol yang digunakan untuk operasi perpangkatan pada Excel adalah...", options: ["*", "^", "#", "&"], answer: 1},
+    {q: "Fungsi logika yang digunakan untuk menguji suatu kondisi benar atau salah adalah...", options: ["IF", "AND", "OR", "LOOKUP"], answer: 0},
+    {q: "Untuk menggabungkan beberapa sel menjadi satu sel yang lebih besar digunakan fitur...", options: ["Wrap Text", "Merge & Center", "AutoSum", "Sort & Filter"], answer: 1},
+    {q: "Fitur yang berguna untuk mengurutkan data dari A ke Z atau dari nilai terkecil ke terbesar adalah...", options: ["Filter", "Sort", "Find", "Replace"], answer: 1},
+    {q: "Perintah tombol pintas (shortcut) untuk menyimpan dokumen Excel adalah...", options: ["Ctrl + C", "Ctrl + V", "Ctrl + S", "Ctrl + P"], answer: 2},
+    {q: "Fungsi VLOOKUP digunakan untuk mencari data secara...", options: ["Mendatar / Horizontal", "Tegak / Vertikal", "Acak", "Diagonal"], answer: 1},
+    {q: "Fungsi HLOOKUP digunakan untuk mencari data secara...", options: ["Vertikal", "Horizontal / Mendatar", "Berurutan", "Silang"], answer: 1},
+    {q: "Fitur 'Wrap Text' pada Microsoft Excel digunakan untuk...", options: ["Menggabungkan dua sel", "Melipat/menyesuaikan teks agar muat dalam satu sel", "Mengubah warna teks", "Meningkatkan ukuran font"], answer: 1},
+    {q: "Tanda '###' yang muncul secara penuh pada suatu sel menandakan bahwa...", options: ["Rumus salah", "Sel rusak", "Lebar kolom terlalu sempit untuk menampilkan angka", "Teks tidak valid"], answer: 2},
+    {q: "Tanda alamat sel absolut (agar sel tidak berubah saat disalin) menggunakan simbol...", options: ["#", "$", "%", "&"], answer: 1},
+    {q: "Pesan kesalahan '#DIV/0!' pada Excel terjadi karena...", options: ["Rumus tertulis salah", "Operasi pembagian dengan angka nol (0)", "Data teks dimasukkan ke rumus angka", "Nama fungsi tidak dikenali"], answer: 1},
+    {q: "Pesan kesalahan '#NAME?' biasanya terjadi apabila...", options: ["Ada pembagian dengan nol", "Penulisan nama fungsi/rumus tidak dikenali", "Kolom kurang lebar", "Data terhapus"], answer: 1},
+    {q: "Lembar kerja tunggal di dalam berkas Excel dinamakan...", options: ["Workbook", "Worksheet / Sheet", "Slide", "Document"], answer: 1},
+    {q: "Kumpulan dari beberapa sheet lembar kerja Excel disebut...", options: ["Workbook", "Workplace", "File Doc", "Database"], answer: 0},
+    {q: "Tombol pintas (shortcut) untuk menduplikasi / menyalin data sel adalah...", options: ["Ctrl + X", "Ctrl + Z", "Ctrl + C", "Ctrl + V"], answer: 2},
+    {q: "Tombol pintas untuk menempelkan (paste) hasil salinan sel adalah...", options: ["Ctrl + V", "Ctrl + P", "Ctrl + A", "Ctrl + X"], answer: 0},
+    {q: "Bagian Excel yang menampilkan isi rumus atau teks dari sel yang aktif dinamakan...", options: ["Title Bar", "Formula Bar", "Status Bar", "Ribbon"], answer: 1},
+    {q: "Fitur yang digunakan untuk menyaring dan menampilkan data tertentu sesuai kriteria adalah...", options: ["Sort", "Filter", "Conditional Formatting", "Data Validation"], answer: 1},
+    {q: "Fitur untuk memberi warna sel secara otomatis berdasarkan aturan/kondisi tertentu adalah...", options: ["Cell Styles", "Format Painter", "Conditional Formatting", "AutoFormat"], answer: 2},
+    {q: "Untuk membuat visualisasi grafik dari data tabel pada Excel, kita menggunakan tab menu...", options: ["Home", "Insert", "Page Layout", "Data"], answer: 1},
+    {q: "Fungsi COUNTA pada Microsoft Excel digunakan untuk...", options: ["Menghitung sel berisi angka saja", "Menghitung sel yang tidak kosong (angka maupun teks)", "Menghitung sel kosong saja", "Menjumlahkan sel"], answer: 1},
+    {q: "Fungsi COUNTBLANK digunakan khusus untuk...", options: ["Menghitung sel yang bernilai positif", "Menghitung sel yang berisi teks", "Menghitung jumlah sel yang kosong", "Menghitung sel yang memiliki kesalahan"], answer: 2},
+    {q: "Jika sel A1 berisi 10 dan sel B1 berisi 5, maka hasil dari rumus '=A1*B1-2' adalah...", options: ["48", "30", "50", "15"], answer: 0},
+    {q: "Rumus Excel yang tepat untuk menghitung rata-rata sel A1 sampai A5 adalah...", options: ["=SUM(A1:A5)", "=AVERAGE(A1:A5)", "=COUNT(A1:A5)", "=MEAN(A1:A5)"], answer: 1},
+    {q: "Area tempat menampilkan nama sel yang sedang aktif (misal A1) disebut...", options: ["Formula Bar", "Name Box", "Status Bar", "Task Pane"], answer: 1},
+    {q: "Tombol pada keyboard yang digunakan untuk membatalkan perintah terakhir (Undo) adalah...", options: ["Ctrl + Y", "Ctrl + Z", "Ctrl + U", "Ctrl + A"], answer: 1}
+];
+
+let questions = [];
+let timeRemaining = 3600; // 60 menit
+let timerInterval;
+let finalScore = 0;
+let correctCount = 0;
+let studentName = "";
+let studentClass = "";
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function initQuiz() {
+    timeRemaining = 3600;
+    questions = JSON.parse(JSON.stringify(rawQuestions));
+    shuffle(questions);
+
+    const container = document.getElementById('questions-container');
+    container.innerHTML = '';
+
+    questions.forEach((qObj, index) => {
+        let originalOptions = qObj.options.map((opt, idx) => ({ text: opt, isCorrect: idx === qObj.answer }));
+        let shuffledOptions = shuffle(originalOptions);
+
+        let qHTML = `<div class="question-card">
+            <div class="question-title">${index + 1}. ${qObj.q}</div>
+            <div class="options">`;
+
+        shuffledOptions.forEach((opt, optIndex) => {
+            qHTML += `<label>
+                <input type="radio" name="q${index}" value="${opt.isCorrect ? '1' : '0'}">
+                ${String.fromCharCode(65 + optIndex)}. ${opt.text}
+            </label>`;
+        });
+
+        qHTML += `</div></div>`;
+        container.innerHTML += qHTML;
+    });
+
+    startTimer();
+}
+
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        timeRemaining--;
+        let minutes = Math.floor(timeRemaining / 60);
+        let seconds = timeRemaining % 60;
+
+        document.getElementById('timer').innerText = 
+            `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+        if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            alert('Waktu ujian telah habis!');
+            submitQuiz();
+        }
+    }, 1000);
+}
+
+function submitQuiz() {
+    studentName = document.getElementById('nama').value.trim();
+    studentClass = document.getElementById('kelas').value.trim();
+
+    if (!studentName || !studentClass) {
+        alert('Mohon isi Nama Lengkap dan Kelas terlebih dahulu!');
+        return;
+    }
+
+    clearInterval(timerInterval);
+
+    correctCount = 0;
+    questions.forEach((_, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === '1') {
+            correctCount++;
+        }
+    });
+
+    finalScore = (correctCount / questions.length) * 100;
+
+    document.getElementById('quiz-screen').style.display = 'none';
+    document.getElementById('result-screen').style.display = 'block';
+
+    document.getElementById('res-nama').innerText = "Nama: " + studentName;
+    document.getElementById('res-kelas').innerText = "Kelas/Absen: " + studentClass;
+    document.getElementById('res-score').innerText = finalScore.toFixed(0);
+    document.getElementById('res-detail').innerText = `Jumlah Benar: ${correctCount} dari ${questions.length} Soal`;
+
+    const statusBox = document.getElementById('status-message');
+    const repeatBtn = document.getElementById('btn-repeat');
+
+    if (finalScore >= 80) {
+        statusBox.className = "status-msg status-success";
+        statusBox.innerText = "Selamat, Anda BERHASIL! (Lulus KKM)";
+        repeatBtn.style.display = "none";
+    } else {
+        statusBox.className = "status-msg status-fail";
+        statusBox.innerText = "Maaf, Anda BELUM BERHASIL. Silakan Mengulang Lagi!";
+        repeatBtn.style.display = "block";
+    }
+}
+
+function resetQuiz() {
+    document.getElementById('result-screen').style.display = 'none';
+    document.getElementById('quiz-screen').style.display = 'block';
+    initQuiz();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function downloadResult() {
+    const textContent = `====================================
+LAPORAN HASIL UJIAN INTERAKTIF
+Mata Pelajaran : Informatika (Microsoft Excel)
+Sekolah        : SMP Negeri 2 Ngadirejo
+Pengampu       : Budi Winarno, S.Kom.
+====================================
+Nama           : ${studentName}
+Kelas/No.Absen : ${studentClass}
+Jumlah Benar   : ${correctCount} / ${questions.length}
+NILAI AKHIR    : ${finalScore.toFixed(0)}
+KETERANGAN     : ${finalScore >= 80 ? 'BERHASIL / LULUS' : 'BELUM BERHASIL / REVISI'}
+====================================`;
+
+    const blob = new Blob([textContent], { type: 'text/plain' });
+    const anchor = document.createElement('a');
+    anchor.download = `Nilai_Excel_${studentName.replace(/\s+/g, '_')}.txt`;
+    anchor.href = window.URL.createObjectURL(blob);
+    anchor.click();
+}
+
+function sendWA() {
+    const statusText = finalScore >= 80 ? "BERHASIL" : "BELUM BERHASIL";
+    const textMsg = `Halo Pak Budi Winarno, S.Kom.,%0ASaya telah selesai mengerjakan Ujian Informatika Excel.%0A%0ANama: *${studentName}*%0AKelas: *${studentClass}*%0ABenar: ${correctCount}/${questions.length}%0ANilai: *${finalScore.toFixed(0)}*%0AKeterangan: *${statusText}*`;
+    window.open(`https://api.whatsapp.com/send?text=${textMsg}`, '_blank');
+}
+
+window.onload = initQuiz;
+</script>
+</body>
+</html>
